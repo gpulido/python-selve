@@ -5,6 +5,8 @@ import serial
 
 from enum import Enum
 
+from .XML2py import deserialize
+
 ser = serial.Serial(
     port='/dev/ttyUSB1',
     baudrate=115200,
@@ -51,10 +53,10 @@ class MethodCall:
         return smlstr
 
 class MethodResponse:
-        
-    def __init__(self, str):
-        self.str = str
-        //TODO: deserialize str
+            
+    def __init__(self, xmlstr):
+        self.xmlstr = xmlstr
+        deserialize(xmlstr)        
         
 
     
