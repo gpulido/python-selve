@@ -58,7 +58,7 @@ class GetHWPoller(threading.Thread):
   def kill(self):
     print("WORKER END")
     sys.stdout.flush()
-    self._Thread__stop()
+    self._stop
 
 
 class HW_Interface(object):
@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
   # Need to set the portname for your Arduino serial port:
   # see "Serial Port" entry in the Arduino "Tools" menu
-  portname = "COM18"
+  portname = "COM1"
   portbaud = "9600"
   ser = serial.Serial(portname,portbaud,timeout=0)
   # timeout=0 means "non-blocking," ser.read() will always return, but
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
   while(1):
     sys.stdout.flush()
-    cmd = raw_input('--> ')
+    cmd = input('--> ')
     cmd = cmd.split()
     sys.stdout.flush()
     if cmd[0] == 'r':
