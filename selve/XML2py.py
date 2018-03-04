@@ -14,8 +14,8 @@ from lxml import objectify
 
 def deserialize(response_xml_text):
     response = objectify.fromstring(response_xml_text.encode('utf8'))
-     if response[0].text === 'fault':
-        print 'commanderror'        
+    if (response[0].text == 'fault'):
+        print ('commanderror')
     else:        
         [element.tag for element in response.array.iterchildren]
 
@@ -46,11 +46,13 @@ def main():
 
     test = objectify.fromstring(error_string.encode('utf8'))
     print (test)
-    if test[0].text === 'fault':
-        print 'commanderror'        
+    if test[0].text == 'fault':
+        print ('commanderror' )       
     else:        
         [element.tag for element in test.array.iterchildren]
 
 
 if __name__ == '__main__':
+    bytearray(8)
+
     main()

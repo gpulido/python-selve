@@ -76,7 +76,7 @@ class HW_Interface(object):
     self.callback = None
     self.verbose = True # for debugging
 
-  def register_callback(self,proc):
+  def register_callback(self, proc):
     """Call this function when the hardware sends us serial data"""
     self.callback = proc
     #self.callback("test!")
