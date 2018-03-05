@@ -7,24 +7,23 @@ from utils import *
 from enum import Enum
 
 
-
 class ParameterType(Enum):
     INT = "int"
     STRING = "string"
     BASE64 = "base64"
 
 class DeviceType(Enum):
-    NOTYPE = 0
-    BLIND = 1
-    AWNING = 2
-    AWNING2 = 3
-    DIMMER = 4
-    DIMMER2 = 5
-    DIMMER3 = 6
-    DIM = 7
-    HEAT = 8
-    HEAT2 = 9
-    COOLING = 10
+    UNKNOWN = 0
+    SHUTTER = 1
+    BLIND = 2
+    AWNING = 3
+    SWITCH = 4
+    DIMMER = 5
+    NIGHT_LIGHT = 6
+    DRAWN_LIGHT = 7
+    HEATING = 8
+    COOLING = 9
+    COOLING2 = 10
     GATEWAY = 11
 
 class CommandType(Enum):
@@ -35,12 +34,12 @@ class CommandType(Enum):
     POSITION_2 = 4
 
 class IveoCommand(Enum):
-    FACTORY = "Factory"
-    TEACH = "Teach"
-    LEARN = "Learn"
-    MANUAL = "Manual"
-    AUTOMATIC = "Automatic"
-    RESULT = "Result"
+    FACTORY = "commandFactory"
+    TEACH = "commandTeach"
+    LEARN = "commandLearn"
+    MANUAL = "commandManual"
+    AUTOMATIC = "commandAutomatic"
+    RESULT = "commandResult"
 
 
 
@@ -70,7 +69,7 @@ class MethodResponse:
 class CommandIveo(MethodCall):
 
     def __init__(self, method_name, parameters):
-         super().__init__("selve.GW.iveo.command" + method_name.value, parameters)
+         super().__init__("selve.GW.iveo." + method_name.value, parameters)
 
 class CommandSingleIveo(CommandIveo):
 
@@ -161,6 +160,7 @@ class IveoDevice():
     def moveIntermediatePosition2(self):
         command = IveoCommandManual(self.mask , CommandType.POSITION_2)
         self.gateway.executeCommand(command)
+
 
 if __name__ == '__main__':
     #print (singlemask(2).decode('utf-8'))
