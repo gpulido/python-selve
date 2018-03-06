@@ -40,12 +40,13 @@ class IveoCommand(Enum):
     MANUAL = "commandManual"
     AUTOMATIC = "commandAutomatic"
     RESULT = "commandResult"
+    GETIDS = "getIDs"
 
 
 
 class MethodCall:
 
-    def __init__(self, method_name, parameters):
+    def __init__(self, method_name, parameters = []):
         self.method_name = method_name
         self.parameters = parameters
 
@@ -58,7 +59,7 @@ class MethodCall:
                 xmlstr+="<{0}>{1}</{0}>".format(typ.value, val)
             xmlstr += "</array>"
         xmlstr+= "</methodCall>"
-        return xmlstr
+        return xmlstr.encode('utf-8')
 
 class MethodResponse:
             
@@ -68,7 +69,7 @@ class MethodResponse:
 
 class CommandIveo(MethodCall):
 
-    def __init__(self, method_name, parameters):
+    def __init__(self, method_name, parameters = []):
          super().__init__("selve.GW.iveo." + method_name.value, parameters)
 
 class CommandSingleIveo(CommandIveo):
@@ -103,32 +104,77 @@ class IveoCommandAutomatic(CommandMaskIveo):
         super().__init__(IveoCommand.AUTOMATIC, mask, command)
 
 class IveoCommandResult(MethodCall):
-     def __init__(self, command, mask, state):
-          super().__init__(IveoCommand.RESULT, [(ParameterType.INT, command), (ParameterType.BASE64, mask), (ParameterType.INT, state)])
+    def __init__(self, command, mask, state):
+        super().__init__(IveoCommand.RESULT, [(ParameterType.INT, command), (ParameterType.BASE64, mask), (ParameterType.INT, state)])
 
+class IveoCommandGetIds(CommandIveo):
+    def __init__(self):
+        super().__init__(IveoCommand.GETIDS)
 
 class Gateway():
 
     def __init__(self, port):
         self.port = port
+        #self.configserial()
+        #self.hw =  HW_Interface(self.ser, 100)
+        #self.hw.register_callback(self.serial_data)
+    
+    def configserial(self):
         self.ser = serial.Serial(
-        port=port,
-        baudrate=115200,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS
-    )
-        self.hw =  HW_Interface(self.ser, 10)
-        self.hw.register_callback(self.serial_data)
+            port=self.port,
+            baudrate=115200,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS)
+        self.ser.timeout = 0
+        self.ser.xonxoff = False
+        self.ser.rtscts = False
+        self.ser.dsrdtr = False
+        self.ser.writeTimeout = 2
+
             
     def executeCommand(self, command):
         commandstr = command.serializeToXML()
-        print( "Gateway writting: " + commandstr)
-        self.hw.write_HW(commandstr)    
+        print( "Gateway writting: " + str(commandstr))
 
-    def close(self):
-        self.hw.kill()
-        self.ser.close() 
+        
+        try:
+            self.configserial()
+
+        except Exception as e:
+            print ("error open serial port: " + str(e))
+            exit()
+        
+        if self.ser.isOpen():
+            try:
+                self.ser.flushInput()
+                self.ser.flushOutput()
+                
+                self.ser.write(commandstr)
+                time.sleep(0.5)
+                numOfLines = 0
+                while True:
+                    response = self.ser.readall()
+                    print("read data: " + str(response.decode()))
+                    if (response.decode()== ''):
+                        break
+                    
+                    #numOfLines = numOfLines + 1
+                    #if (numOfLines >= 5 ):
+                    #    break
+                
+                self.ser.close()
+            except Exception as e1:
+                print ("error communicating...: " + str(e1))
+        else:
+            print ("cannot open serial port")
+
+        
+        #self.hw.write_HW(commandstr)    
+
+    #def close(self):
+        #self.hw.kill()
+        #self.ser.close() 
 
     def serial_data(self, data):
         print (data)
@@ -146,11 +192,11 @@ class IveoDevice():
         self.gateway.executeCommand(command)
 
     def moveDown(self):
-        command = IveoCommandManual(self.mask , CommandType.DEPARTURE)
+        command = IveoCommandManual(self.mask , CommandType.DRIVEAWAY)
         self.gateway.executeCommand(command)
 
     def moveUp(self):
-        command = IveoCommandManual(self.mask , CommandType.DRIVEAWAY)
+        command = IveoCommandManual(self.mask , CommandType.DEPARTURE)
         self.gateway.executeCommand(command)
     
     def moveIntermediatePosition1(self):
@@ -167,28 +213,13 @@ if __name__ == '__main__':
 
     #manual = MethodCall("selve.GW.iveo.getIDs",[])
     portname = '/dev/cu.usbserial-DJ00T875'
-    ser = serial.Serial(
-        port=portname,
-        baudrate=115200,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS
-    )
-    teststring = '<methodCall><methodName>selve.GW.iveo.commandManual</methodName><array><base64>AQAAAAAAAAA=</base64><int>1</int></array></methodCall>'
-    ser.write(teststring.encode())
-    #time.sleep(3)
-    while(1):
-        read_val = ser.read(size=64)
-        print(read_val)
-    #ser.write(manual.serializeToXML().encode())
-    #print (singlemask(2).decode('utf-8'))
-    #command = IveoCommandManual(singlemask(1).decode('utf-8'), CommandType.DEPARTURE)
-    #a = command.serializeToXML()
-    #print (a)
-    #ser.write(a.encode())
-    #gat = Gateway(portname)
-    #device1 = IveoDevice(gat, 1)
-    #device1.moveIntermediatePosition1()
-    #gat.close()
-    ser.close()
+    gat = Gateway(portname)
+    # device1 = IveoDevice(gat, 1)
+    # time.sleep(1)
+    # device1.stop()
+    gat.executeCommand(IveoCommandGetIds())
+    #response = b'<?xml version="1.0"? encoding="UTF-8">\r\n<methodResponse>\r\n\t<array>\r\n\t\t<string>selve.GW.iveo.commandManual</string>\r\n\t\t<int>1</int>\r\n\t</array>\r\n</methodResponse>\r\n\n<?xml version="1.0"? encoding="UTF-8">\r\n<methodCall>\r\n<methodName>selve.GW.iveo.commandResult</methodName>\r\n\t<array>\r\n\t\t<int>0</int>\r\n\t\t<base64>AQAAAAAAAAA=</base64>\r\n\t\t<int>0</int>\r\n\t</array>\r\n</methodCall>\r\n\n'
+    #c = response.decode()
+    #print(c)
+    #deserialize(response)
 
