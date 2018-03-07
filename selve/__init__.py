@@ -41,6 +41,8 @@ class IveoCommand(Enum):
     AUTOMATIC = "commandAutomatic"
     RESULT = "commandResult"
     GETIDS = "getIDs"
+    SETLABEL = "setLabel"
+    SETCONFIG = "setConfig"
 
 
 
@@ -74,8 +76,8 @@ class CommandIveo(MethodCall):
 
 class CommandSingleIveo(CommandIveo):
 
-    def __init__(self, method_name, iveoID):
-        super().__init__(method_name, [(ParameterType.INT, iveoID)])
+    def __init__(self, method_name, iveoID, parameters = [(ParameterType.INT, iveoID)]):
+        super().__init__(method_name, parameters)
 
 class CommandMaskIveo(CommandIveo):
 
@@ -106,6 +108,18 @@ class IveoCommandAutomatic(CommandMaskIveo):
 class IveoCommandResult(MethodCall):
     def __init__(self, command, mask, state):
         super().__init__(IveoCommand.RESULT, [(ParameterType.INT, command), (ParameterType.BASE64, mask), (ParameterType.INT, state)])
+
+class IveoComandSetLabel(CommandIveo):
+    def __init__(self, iveoId, label):
+        super().__init__(IveoCommand.SETLABEL, [(ParameterType.INT, iveoID), (ParameterType.STRING, label)])
+
+class IveoComandSetConfig(CommandIveo):
+    def __init__(self, iveoId, activity, device_type):
+        super().__init__(IveoCommand.SETCONFIG, [(ParameterType.INT, iveoID), (ParameterType.INT, activity), (ParameterType.INT, device_type)])
+
+class IveoComandGetConfig(CommandSingleIveo):
+    def __init__(self, iveoId):
+        super().__init__(IveoCommand.GETCONFIG)
 
 class IveoCommandGetIds(CommandIveo):
     def __init__(self):
