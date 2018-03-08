@@ -11,6 +11,7 @@ Usage:
 '''
 
 from lxml import objectify
+import untangle
 
 def deserialize(response_xml_text):
     response = objectify.fromstring(response_xml_text.encode('utf8'))
@@ -19,6 +20,7 @@ def deserialize(response_xml_text):
     else:        
         [element.tag for element in response.array.iterchildren]
 
+def parseResponse()
 
 def main():
 
@@ -53,6 +55,4 @@ def main():
 
 
 if __name__ == '__main__':
-    bytearray(8)
-
     main()

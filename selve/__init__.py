@@ -64,10 +64,10 @@ class MethodCall:
         return xmlstr.encode('utf-8')
 
 class MethodResponse:
-            
+
     def __init__(self, xmlstr):
         self.xmlstr = xmlstr
-        #utils.deserialize(xmlstr)        
+        deserialize(xmlstr)        
 
 class CommandIveo(MethodCall):
 
@@ -76,7 +76,7 @@ class CommandIveo(MethodCall):
 
 class CommandSingleIveo(CommandIveo):
 
-    def __init__(self, method_name, iveoID, parameters = [(ParameterType.INT, iveoID)]):
+    def __init__(self, method_name, iveoID, parameters):
         super().__init__(method_name, parameters)
 
 class CommandMaskIveo(CommandIveo):
@@ -111,11 +111,11 @@ class IveoCommandResult(MethodCall):
 
 class IveoComandSetLabel(CommandIveo):
     def __init__(self, iveoId, label):
-        super().__init__(IveoCommand.SETLABEL, [(ParameterType.INT, iveoID), (ParameterType.STRING, label)])
+        super().__init__(IveoCommand.SETLABEL, [(ParameterType.INT, iveoId), (ParameterType.STRING, label)])
 
 class IveoComandSetConfig(CommandIveo):
     def __init__(self, iveoId, activity, device_type):
-        super().__init__(IveoCommand.SETCONFIG, [(ParameterType.INT, iveoID), (ParameterType.INT, activity), (ParameterType.INT, device_type)])
+        super().__init__(IveoCommand.SETCONFIG, [(ParameterType.INT, iveoId), (ParameterType.INT, activity), (ParameterType.INT, device_type)])
 
 class IveoComandGetConfig(CommandSingleIveo):
     def __init__(self, iveoId):
@@ -206,11 +206,11 @@ class IveoDevice():
         self.gateway.executeCommand(command)
 
     def moveDown(self):
-        command = IveoCommandManual(self.mask , CommandType.DRIVEAWAY)
+        command = IveoCommandManual(self.mask , CommandType.DEPARTURE)
         self.gateway.executeCommand(command)
 
     def moveUp(self):
-        command = IveoCommandManual(self.mask , CommandType.DEPARTURE)
+        command = IveoCommandManual(self.mask , CommandType.DRIVEAWAY)
         self.gateway.executeCommand(command)
     
     def moveIntermediatePosition1(self):
@@ -228,10 +228,19 @@ if __name__ == '__main__':
     #manual = MethodCall("selve.GW.iveo.getIDs",[])
     portname = '/dev/cu.usbserial-DJ00T875'
     gat = Gateway(portname)
-    # device1 = IveoDevice(gat, 1)
+
+    device1 = IveoDevice(gat, 1)
+    device2 = IveoDevice(gat, 2)
+    device1.moveDown()
+    time.sleep(5)
+    device1.moveUp()
+    device2.moveDown()
+    time.sleep(3)
+    device1.stop()
+    device2.stop
     # time.sleep(1)
     # device1.stop()
-    gat.executeCommand(IveoCommandGetIds())
+    #gat.executeCommand(IveoCommandGetIds())
     #response = b'<?xml version="1.0"? encoding="UTF-8">\r\n<methodResponse>\r\n\t<array>\r\n\t\t<string>selve.GW.iveo.commandManual</string>\r\n\t\t<int>1</int>\r\n\t</array>\r\n</methodResponse>\r\n\n<?xml version="1.0"? encoding="UTF-8">\r\n<methodCall>\r\n<methodName>selve.GW.iveo.commandResult</methodName>\r\n\t<array>\r\n\t\t<int>0</int>\r\n\t\t<base64>AQAAAAAAAAA=</base64>\r\n\t\t<int>0</int>\r\n\t</array>\r\n</methodCall>\r\n\n'
     #c = response.decode()
     #print(c)
