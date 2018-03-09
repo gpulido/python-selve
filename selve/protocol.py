@@ -1,4 +1,6 @@
 import untangle
+from enum import Enum
+from itertools import chain
 
 
 class ParameterType(Enum):
@@ -22,39 +24,14 @@ class MethodCall:
             xmlstr += "</array>"
         xmlstr+= "</methodCall>"
         return xmlstr.encode('utf-8')
-
-class ErrorResponse:
-
-    def __init__(self, message, code):
-        self.message = message
-        self.code = code
-
-
-def create_error(obj):
-    return ErrorResponse(obj.methodResponse.fault.string.cdata, obj.methodResponse.fault.int.cdata ) 
-
-def processResponse(obj):
-    array = obj.methodResponse.array
-    methodName = list(array.string)[0].cdata
-    str_params_tmp = list(array.string)[1:]
-    str_params = [(ParameterType.STRING, v) for v in str_params_tmp]
-    int_params = []
-    if hasattr(array, ParameterType.INT):
-        int_params = [(ParameterType.INT, v) for v in list(array.int)]
-    b64_params = []
-    if hasattr(array, ParameterType.BASE64):
-        b64_params = [(ParameterType.BASE64, v) for v in list(array.base64)]
-    paramslist = str_params.extend(int_params).extend(b64_params)
-    return MethodResponse(methodName, paramslist)
-
-
-def process_response(xmlstr):
-    obj = untangle.parse(xmlstr)
-    if hasattr(obj.methodResponse, 'fault'):
-        return create_error(obj)
-    else:
-        return create_response(obj)
-
+    
+    def execute(self, gateway):
+        response = gateway.executeCommand(self)
+        if response != None and isinstance(response, MethodResponse):
+            self.process_response(response)
+    
+    def process_response(self, methodResponse):
+        print (methodResponse)
 
 
 class MethodResponse:
@@ -69,9 +46,41 @@ class ErrorResponse:
         self.message = message
         self.code = code
 
-ef main():
 
-    selve_string = '''<?xml version="1.0"?>
+def create_error(obj):
+    return ErrorResponse(obj.methodResponse.fault.array.string.cdata, obj.methodResponse.fault.array.int.cdata ) 
+
+def create_response(obj):
+    array = obj.methodResponse.array
+    methodName = list(array.string)[0].cdata
+    str_params_tmp = list(array.string)[1:]
+    str_params = [(ParameterType.STRING, v.cdata) for v in str_params_tmp]
+    int_params = []
+    if hasattr(array, ParameterType.INT.value):
+        int_params = [(ParameterType.INT, v.cdata) for v in list(array.int)]
+    b64_params = []
+    if hasattr(array, ParameterType.BASE64.value):
+        b64_params = [(ParameterType.BASE64, v.cdata) for v in list(array.base64)]
+    paramslist = [str_params, int_params, b64_params]
+    flat_params_list = list(chain.from_iterable(paramslist))
+    return MethodResponse(methodName, flat_params_list)
+
+
+def process_response(xmlstr):
+    corrected_xml = xmlstr.replace('?xml version="1.0"? encoding="UTF-8"', '?xml version="1.0" encoding="UTF-8"?')
+    obj = untangle.parse(corrected_xml)
+    if hasattr(obj.methodResponse, 'fault'):
+        return create_error(obj)
+    else:
+        return create_response(obj)
+
+
+
+
+
+def main():
+
+    selve_string = '''<?xml version="1.0" encoding="UTF-8"?>
     <methodResponse>
         <array>
             <string>Methodenname</string>
@@ -93,12 +102,9 @@ ef main():
     </methodResponse>
     '''
 
-    test = objectify.fromstring(error_string.encode('utf8'))
-    print (test)
-    if test[0].text == 'fault':
-        print ('commanderror' )       
-    else:        
-        [element.tag for element in test.array.iterchildren]
+    a ='<?xml version="1.0"? encoding="UTF-8">\r\n<methodResponse>\r\n\t<array>\r\n\t\t<string>selve.GW.iveo.getIDs</string>\r\n\t\t<base64>fx4AAAAAAAA=</base64>\r\n\t</array>\r\n</methodResponse>\r\n\n'
+
+    process_response(selve_string)
 
 
 if __name__ == '__main__':

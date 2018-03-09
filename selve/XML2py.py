@@ -20,8 +20,6 @@ def deserialize(response_xml_text):
     else:        
         [element.tag for element in response.array.iterchildren]
 
-def parseResponse()
-
 def main():
 
     selve_string = '''<?xml version="1.0"?>

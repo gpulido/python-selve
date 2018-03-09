@@ -4,6 +4,7 @@ import time
 import serial
 from HW_Thread import *
 from utils import *
+from protocol import *
 from enum import Enum
 
 
@@ -43,31 +44,9 @@ class IveoCommand(Enum):
     GETIDS = "getIDs"
     SETLABEL = "setLabel"
     SETCONFIG = "setConfig"
+    GETCONFIG = "getConfig"
 
 
-
-class MethodCall:
-
-    def __init__(self, method_name, parameters = []):
-        self.method_name = method_name
-        self.parameters = parameters
-
-    def serializeToXML(self):
-        xmlstr = "<methodCall>"
-        xmlstr += "<methodName>"+self.method_name+"</methodName>"
-        if (len(self.parameters) > 0):
-            xmlstr += "<array>"
-            for typ, val in self.parameters:
-                xmlstr+="<{0}>{1}</{0}>".format(typ.value, val)
-            xmlstr += "</array>"
-        xmlstr+= "</methodCall>"
-        return xmlstr.encode('utf-8')
-
-class MethodResponse:
-
-    def __init__(self, xmlstr):
-        self.xmlstr = xmlstr
-        deserialize(xmlstr)        
 
 class CommandIveo(MethodCall):
 
@@ -76,8 +55,8 @@ class CommandIveo(MethodCall):
 
 class CommandSingleIveo(CommandIveo):
 
-    def __init__(self, method_name, iveoID, parameters):
-        super().__init__(method_name, parameters)
+    def __init__(self, method_name, iveoID):
+        super().__init__(method_name, [(ParameterType.INT, iveoID)])
 
 class CommandMaskIveo(CommandIveo):
 
@@ -119,16 +98,25 @@ class IveoComandSetConfig(CommandIveo):
 
 class IveoComandGetConfig(CommandSingleIveo):
     def __init__(self, iveoId):
-        super().__init__(IveoCommand.GETCONFIG)
+        super().__init__(IveoCommand.GETCONFIG, iveoId)
+    
+    def process_response(self, methodResponse):
+        self.name = methodResponse.parameters[0][1]
+        self.activity = methodResponse.parameters[2][1]
+        self.deviceType = DeviceType(int(methodResponse.parameters[3][1]))
 
 class IveoCommandGetIds(CommandIveo):
     def __init__(self):
         super().__init__(IveoCommand.GETIDS)
+    
+    def process_response(self, methodResponse):
+        self.ids = true_in_list(b64bytes_to_bitlist(methodResponse.parameters[0][1]))
 
 class Gateway():
 
     def __init__(self, port):
         self.port = port
+        self.discover()
         #self.configserial()
         #self.hw =  HW_Interface(self.ser, 100)
         #self.hw.register_callback(self.serial_data)
@@ -150,7 +138,6 @@ class Gateway():
     def executeCommand(self, command):
         commandstr = command.serializeToXML()
         print( "Gateway writting: " + str(commandstr))
-
         
         try:
             self.configserial()
@@ -167,21 +154,22 @@ class Gateway():
                 self.ser.write(commandstr)
                 time.sleep(0.5)
                 numOfLines = 0
+                response_str = "" 
                 while True:
                     response = self.ser.readall()
-                    print("read data: " + str(response.decode()))
+                    response_str += str(response.decode())
+                    print("read data: " + response_str)
                     if (response.decode()== ''):
                         break
                     
-                    #numOfLines = numOfLines + 1
-                    #if (numOfLines >= 5 ):
-                    #    break
-                
                 self.ser.close()
+                return process_response(response_str)
             except Exception as e1:
                 print ("error communicating...: " + str(e1))
         else:
             print ("cannot open serial port")
+        
+        return None
 
         
         #self.hw.write_HW(commandstr)    
@@ -193,6 +181,16 @@ class Gateway():
     def serial_data(self, data):
         print (data)
 
+    def discover(self):
+        command = IveoCommandGetIds()
+        command.execute(self)
+        self.devices = [IveoDevice(self, id) for id in command.ids]
+        for device in self.devices:
+            device.discover_properties()
+            print(str(device))
+            
+
+
 
 class IveoDevice():
 
@@ -200,6 +198,8 @@ class IveoDevice():
         self.iveoID = iveoID
         self.gateway = gateway
         self.mask = singlemask(iveoID)
+        self.device_type = DeviceType.UNKNOWN
+        self.name = "Not defined"
     
     def stop(self):
         command = IveoCommandManual(self.mask , CommandType.STOP)
@@ -221,6 +221,18 @@ class IveoDevice():
         command = IveoCommandManual(self.mask , CommandType.POSITION_2)
         self.gateway.executeCommand(command)
 
+    def discover_properties(self):
+        command = IveoComandGetConfig(self.iveoID)
+        command.execute(self.gateway)
+        self.device_type = command.deviceType
+        self.name = command.name
+    
+    def __str__(self):
+        return "Device of type: " + self.device_type.name + " on channel " + str(self.iveoID) + " with name " + self.name
+        
+        
+
+
 
 if __name__ == '__main__':
     #print (singlemask(2).decode('utf-8'))
@@ -229,18 +241,20 @@ if __name__ == '__main__':
     portname = '/dev/cu.usbserial-DJ00T875'
     gat = Gateway(portname)
 
-    device1 = IveoDevice(gat, 1)
-    device2 = IveoDevice(gat, 2)
-    device1.moveDown()
-    time.sleep(5)
-    device1.moveUp()
-    device2.moveDown()
-    time.sleep(3)
-    device1.stop()
-    device2.stop
+    # device1 = IveoDevice(gat, 1)
+    # device2 = IveoDevice(gat, 2)
+    # device1.moveDown()
+    # time.sleep(5)
+    # device1.moveUp()
+    # device2.moveDown()
+    # time.sleep(3)
+    # device1.stop()
+    # device2.stop
     # time.sleep(1)
     # device1.stop()
-    #gat.executeCommand(IveoCommandGetIds())
+    #command = IveoCommandGetIds()
+    #command.execute(gat)
+    #print (command.ids)
     #response = b'<?xml version="1.0"? encoding="UTF-8">\r\n<methodResponse>\r\n\t<array>\r\n\t\t<string>selve.GW.iveo.commandManual</string>\r\n\t\t<int>1</int>\r\n\t</array>\r\n</methodResponse>\r\n\n<?xml version="1.0"? encoding="UTF-8">\r\n<methodCall>\r\n<methodName>selve.GW.iveo.commandResult</methodName>\r\n\t<array>\r\n\t\t<int>0</int>\r\n\t\t<base64>AQAAAAAAAAA=</base64>\r\n\t\t<int>0</int>\r\n\t</array>\r\n</methodCall>\r\n\n'
     #c = response.decode()
     #print(c)
