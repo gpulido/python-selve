@@ -74,10 +74,6 @@ def process_response(xmlstr):
     else:
         return create_response(obj)
 
-
-
-
-
 def main():
 
     selve_string = '''<?xml version="1.0" encoding="UTF-8"?>

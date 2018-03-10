@@ -2,16 +2,12 @@
 
 import time
 import serial
-from HW_Thread import *
-from utils import *
-from protocol import *
 from enum import Enum
 
+from utils import * 
+from iveo import *
+from protocol import *
 
-class ParameterType(Enum):
-    INT = "int"
-    STRING = "string"
-    BASE64 = "base64"
 
 class DeviceType(Enum):
     UNKNOWN = 0
@@ -34,92 +30,12 @@ class CommandType(Enum):
     POSITION_1 = 3
     POSITION_2 = 4
 
-class IveoCommand(Enum):
-    FACTORY = "commandFactory"
-    TEACH = "commandTeach"
-    LEARN = "commandLearn"
-    MANUAL = "commandManual"
-    AUTOMATIC = "commandAutomatic"
-    RESULT = "commandResult"
-    GETIDS = "getIDs"
-    SETLABEL = "setLabel"
-    SETCONFIG = "setConfig"
-    GETCONFIG = "getConfig"
-
-
-
-class CommandIveo(MethodCall):
-
-    def __init__(self, method_name, parameters = []):
-         super().__init__("selve.GW.iveo." + method_name.value, parameters)
-
-class CommandSingleIveo(CommandIveo):
-
-    def __init__(self, method_name, iveoID):
-        super().__init__(method_name, [(ParameterType.INT, iveoID)])
-
-class CommandMaskIveo(CommandIveo):
-
-    def __init__(self, method_name, mask, command):
-        super().__init__(method_name, [(ParameterType.BASE64, mask), (ParameterType.INT, command.value)])
-
-class IveoCommandFactory(CommandSingleIveo):
-
-     def __init__(self, iveoID):
-         super().__init__(IveoCommand.FACTORY, iveoID)
-
-class IveoCommandTeach(CommandSingleIveo):
-     def __init__(self, iveoID):
-         super().__init__(IveoCommand.TEACH, iveoID)
-
-class IveoCommandLearn(CommandSingleIveo):
-     def __init__(self, iveoID):
-         super().__init__(IveoCommand.LEARN, iveoID)
-         
-class IveoCommandManual(CommandMaskIveo):
-    def  __init__(self, mask, command):
-        super().__init__(IveoCommand.MANUAL, mask, command)
-
-class IveoCommandAutomatic(CommandMaskIveo):
-    def  __init__(self, mask, command):
-        super().__init__(IveoCommand.AUTOMATIC, mask, command)
-
-class IveoCommandResult(MethodCall):
-    def __init__(self, command, mask, state):
-        super().__init__(IveoCommand.RESULT, [(ParameterType.INT, command), (ParameterType.BASE64, mask), (ParameterType.INT, state)])
-
-class IveoComandSetLabel(CommandIveo):
-    def __init__(self, iveoId, label):
-        super().__init__(IveoCommand.SETLABEL, [(ParameterType.INT, iveoId), (ParameterType.STRING, label)])
-
-class IveoComandSetConfig(CommandIveo):
-    def __init__(self, iveoId, activity, device_type):
-        super().__init__(IveoCommand.SETCONFIG, [(ParameterType.INT, iveoId), (ParameterType.INT, activity), (ParameterType.INT, device_type)])
-
-class IveoComandGetConfig(CommandSingleIveo):
-    def __init__(self, iveoId):
-        super().__init__(IveoCommand.GETCONFIG, iveoId)
-    
-    def process_response(self, methodResponse):
-        self.name = methodResponse.parameters[0][1]
-        self.activity = methodResponse.parameters[2][1]
-        self.deviceType = DeviceType(int(methodResponse.parameters[3][1]))
-
-class IveoCommandGetIds(CommandIveo):
-    def __init__(self):
-        super().__init__(IveoCommand.GETIDS)
-    
-    def process_response(self, methodResponse):
-        self.ids = true_in_list(b64bytes_to_bitlist(methodResponse.parameters[0][1]))
 
 class Gateway():
 
     def __init__(self, port):
         self.port = port
         self.discover()
-        #self.configserial()
-        #self.hw =  HW_Interface(self.ser, 100)
-        #self.hw.register_callback(self.serial_data)
     
     def configserial(self):
         self.ser = serial.Serial(
@@ -171,13 +87,6 @@ class Gateway():
         
         return None
 
-        
-        #self.hw.write_HW(commandstr)    
-
-    #def close(self):
-        #self.hw.kill()
-        #self.ser.close() 
-
     def serial_data(self, data):
         print (data)
 
@@ -189,50 +98,7 @@ class Gateway():
             device.discover_properties()
             print(str(device))
             
-
-
-
-class IveoDevice():
-
-    def __init__(self, gateway, iveoID):
-        self.iveoID = iveoID
-        self.gateway = gateway
-        self.mask = singlemask(iveoID)
-        self.device_type = DeviceType.UNKNOWN
-        self.name = "Not defined"
     
-    def stop(self):
-        command = IveoCommandManual(self.mask , CommandType.STOP)
-        self.gateway.executeCommand(command)
-
-    def moveDown(self):
-        command = IveoCommandManual(self.mask , CommandType.DEPARTURE)
-        self.gateway.executeCommand(command)
-
-    def moveUp(self):
-        command = IveoCommandManual(self.mask , CommandType.DRIVEAWAY)
-        self.gateway.executeCommand(command)
-    
-    def moveIntermediatePosition1(self):
-        command = IveoCommandManual(self.mask , CommandType.POSITION_1)
-        self.gateway.executeCommand(command)
-
-    def moveIntermediatePosition2(self):
-        command = IveoCommandManual(self.mask , CommandType.POSITION_2)
-        self.gateway.executeCommand(command)
-
-    def discover_properties(self):
-        command = IveoComandGetConfig(self.iveoID)
-        command.execute(self.gateway)
-        self.device_type = command.deviceType
-        self.name = command.name
-    
-    def __str__(self):
-        return "Device of type: " + self.device_type.name + " on channel " + str(self.iveoID) + " with name " + self.name
-        
-        
-
-
 
 if __name__ == '__main__':
     #print (singlemask(2).decode('utf-8'))
