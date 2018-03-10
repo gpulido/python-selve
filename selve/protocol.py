@@ -2,6 +2,26 @@ import untangle
 from enum import Enum
 from itertools import chain
 
+class DeviceType(Enum):
+    UNKNOWN = 0
+    SHUTTER = 1
+    BLIND = 2
+    AWNING = 3
+    SWITCH = 4
+    DIMMER = 5
+    NIGHT_LIGHT = 6
+    DRAWN_LIGHT = 7
+    HEATING = 8
+    COOLING = 9
+    COOLING2 = 10
+    GATEWAY = 11
+
+class CommandType(Enum):
+    STOP = 0
+    DRIVEAWAY = 1
+    DEPARTURE = 2
+    POSITION_1 = 3
+    POSITION_2 = 4
 
 class ParameterType(Enum):
     INT = "int"

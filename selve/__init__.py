@@ -69,7 +69,6 @@ class Gateway():
                 
                 self.ser.write(commandstr)
                 time.sleep(0.5)
-                numOfLines = 0
                 response_str = "" 
                 while True:
                     response = self.ser.readall()
@@ -93,9 +92,8 @@ class Gateway():
     def discover(self):
         command = IveoCommandGetIds()
         command.execute(self)
-        self.devices = [IveoDevice(self, id) for id in command.ids]
+        self.devices = [IveoDevice(self, id, True) for id in command.ids]
         for device in self.devices:
-            device.discover_properties()
             print(str(device))
             
     

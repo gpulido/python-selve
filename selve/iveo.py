@@ -1,5 +1,6 @@
 from enum import Enum
 from protocol import *
+from utils import *
 
 class IveoCommand(Enum):
     FACTORY = "commandFactory"
@@ -98,32 +99,34 @@ class IveoCommandGetIds(CommandIveo):
 
 class IveoDevice():
 
-    def __init__(self, gateway, iveoID):
+    def __init__(self, gateway, iveoID, discover = False):
         self.iveoID = iveoID
         self.gateway = gateway
         self.mask = singlemask(iveoID)
         self.device_type = DeviceType.UNKNOWN
         self.name = "Not defined"
+        if discover:
+            self.discover_properties()
     
-    def stop(self, automatic = false):
+    def stop(self, automatic = False):
         self.executeCommand(CommandType.STOP, automatic)
 
-    def moveDown(self, automatic = false):
+    def moveDown(self, automatic = False):
         self.executeCommand(CommandType.DEPARTURE, automatic)
     
-    def moveUp(self, automatic = false):
+    def moveUp(self, automatic = False):
         self.executeCommand(CommandType.DRIVEAWAY, automatic)
     
-    def moveIntermediatePosition1(self, automatic = false):
+    def moveIntermediatePosition1(self, automatic = False):
         self.executeCommand(CommandType.POSITION_1, automatic)
 
-    def moveIntermediatePosition2(self, automatic = false):
+    def moveIntermediatePosition2(self, automatic = False):
         self.executeCommand(CommandType.POSITION_2, automatic)
 
-    def executeCommand(self, commandType, automatic = false):
+    def executeCommand(self, commandType, automatic = False):
         if automatic:
             command = IveoCommandAutomatic(self.mask, commandType)
-        else
+        else:
             command = IveoCommandManual(self.mask, commandType)
         command.execute(self.gateway)
         return command
