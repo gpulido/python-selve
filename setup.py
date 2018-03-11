@@ -22,7 +22,7 @@ setup(
     url='https://github.com/gpulido/python-selve',  # Optional
     author='Gabriel Pulido',  # Optional
    
-    author_email='',  # Optional
+    author_email='gabriel.pulidodetorres@gmail.com',  # Optional
 
     # Classifiers help users find your project by categorizing it.
     #
@@ -54,7 +54,10 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['base64'],  # Optional
+    install_requires=[
+        'base64',
+        'untangle'
+        ],  # Optional
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow

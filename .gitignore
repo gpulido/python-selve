@@ -103,3 +103,5 @@ ENV/
 #vscode
 .vscode/
 selve/__init__.py
+
+.pypirc
