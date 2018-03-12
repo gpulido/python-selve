@@ -10,9 +10,9 @@ Example of use
 
 Create a new instance of the gateway:
 
-```python
-gat = Gateway(portname)
-```
+.. code-block:: python
+   gat = Gateway(portname)
+
 
 portname is the name of the serial port where the usb rf gateway is listed on the os. Please refer to the serial library documentation.
 
@@ -20,9 +20,8 @@ By default the gateway will discover all Iveo devices already registered onto th
 
 To access them:
 
-```python
-gat.devices()
-```
+.. code-block:: python
+   gat.devices()
 
 Will return a list of IveoDevices()
 
@@ -30,10 +29,9 @@ Each IveoDevice can be controlled by using the already defined commands: stop() 
 
 The library also allows to send directly commands to the gateway without the need of using the IveoDevice abstraction just create the command and execute using the gateway:
 
-```python
-command = IveoCommandGetIds()
-command.execute(gat)
-```
+.. code-block:: python
+   command = IveoCommandGetIds()
+   command.execute(gat)
 
 Once executed the response is stored in the command instance for later user or just to discard.
 
