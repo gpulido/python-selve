@@ -1,6 +1,12 @@
 from enum import Enum
-from protocol import *
-from utils import *
+
+from selve.protocol import MethodCall
+from selve.protocol import ParameterType
+from selve.protocol import DeviceType
+from selve.protocol import CommandType
+from selve.utils import singlemask
+from selve.utils import true_in_list
+from selve.utils import b64bytes_to_bitlist
 
 class IveoCommand(Enum):
     FACTORY = "commandFactory"

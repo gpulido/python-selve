@@ -5,13 +5,15 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("list", help="print the list of registered  devices")
+
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("--list", help="print the list of registered  devices")
+group.add_argument("--action", choices = ['stop', 'up', 'down', 'pos1', 'pos2'], default = 'stop', help="Command to execute over the device")
 parser.add_argument("--port", help="serial port")
 parser.add_argument("--iveoId", type=int, help="IveoId / channel where the device is registered'")
-parser.add_argument("--action", choices = ['stop', 'up', 'down', 'pos1', 'pos2'], default = 'stop', help="Command to execute over the device")
 args = parser.parse_args()
 
-gat = Gateway(args.port)
+gat = selve.Gateway(args.port)
 
 if  args.list:
     gat.list_devices()

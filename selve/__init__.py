@@ -4,12 +4,9 @@ import time
 import serial
 from enum import Enum
 
-from utils import * 
-from iveo import *
-from protocol import *
-
-
-
+from selve.utils import * 
+from selve.iveo import *
+from selve.protocol import *
 
 
 class Gateway():
@@ -82,7 +79,7 @@ class Gateway():
 
     def list_devices(self):
         for device in self.devices:
-        print(str(device))
+            print(str(device))
             
     
 

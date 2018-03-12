@@ -1,7 +1,6 @@
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 
-
 # To use a consistent encoding
 from codecs import open
 from os import path
@@ -16,7 +15,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     
     name='python-selve',  # Required    
-    version='0.0.1.dev1',  # Required  
+    version='0.0.1.dev8',  # Required  
     description='Python library for interfacing with selve devices using the USB-RF controller',  # Required   
     long_description=long_description,  # Optional    
     url='https://github.com/gpulido/python-selve',  # Optional
@@ -55,7 +54,8 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'base64',
+        'pySerial',
+        'pybase64',
         'untangle'
         ],  # Optional
 
