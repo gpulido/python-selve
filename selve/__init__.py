@@ -75,7 +75,7 @@ class Gateway():
         self.list_devices()        
 
     def is_id_registered(self, id):
-        return id in [iveoID for device.iveoId in self.devices]
+        return id in [device.iveoID for device in self.devices]
 
     def list_devices(self):
         for device in self.devices:
