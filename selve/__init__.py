@@ -14,9 +14,10 @@ from protocol import *
 
 class Gateway():
 
-    def __init__(self, port):
+    def __init__(self, port, discover = True):
         self.port = port
-        self.discover()
+        if discover:
+            self.discover()
     
     def configserial(self):
         self.ser = serial.Serial(
@@ -74,8 +75,14 @@ class Gateway():
         command = IveoCommandGetIds()
         command.execute(self)
         self.devices = [IveoDevice(self, id, True) for id in command.ids]
+        self.list_devices()        
+
+    def is_id_registered(self, id):
+        return id in [iveoID for device.iveoId in self.devices]
+
+    def list_devices(self):
         for device in self.devices:
-            print(str(device))
+        print(str(device))
             
     
 
