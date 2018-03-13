@@ -101,7 +101,8 @@ class IveoCommandGetIds(CommandIveo):
         super().__init__(IveoCommand.GETIDS)
     
     def process_response(self, methodResponse):
-        self.ids = true_in_list(b64bytes_to_bitlist(methodResponse.parameters[0][1]))
+        self.ids = [ b for b in true_in_list(b64bytes_to_bitlist(methodResponse.parameters[0][1]))]
+        print(self.ids)
 
 class IveoDevice():
 

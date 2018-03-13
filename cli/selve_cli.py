@@ -11,20 +11,25 @@ def list_devices(args):
     gat.list_devices()
 
 def action(args):
-    gat = selve.Gateway(args.port)
-    if not gat.is_id_registered(args.iveoId):    
-        sys.exit("The device is not registered on the gateway")
+    gat = selve.Gateway(args.port, args.discover)
+    if args.discover: 
+        if not gat.is_id_registered(args.iveoId):    
+            sys.exit("The device is not registered on the gateway")
+        device = gat.devices[args.iveoId]
+    else:
+        device = selve.IveoDevice(gat, args.iveoId)
+
 
     if args.command == 'stop':
-        gat.devices[args.iveoId].stop(args.automation)
+        device.stop(args.automation)
     elif args.command == 'up':
-        gat.devices[args.iveoId].moveUp(args.automation)
+        device.moveUp(args.automation)
     elif args.command == 'down':
-        gat.devices[args.iveoId].moveDown(args.automation)
+        device.moveDown(args.automation)
     elif args.command == 'pos1':
-        gat.devices[args.iveoId].moveIntermediatePosition1(args.automation)
+        device.moveIntermediatePosition1(args.automation)
     elif args.command == 'pos2':
-        gat.devices[args.iveoId].moveIntermediatePosition2(args.automation)
+        device.moveIntermediatePosition2(args.automation)
 
 
 parser = argparse.ArgumentParser(prog='selve-cli')
@@ -37,11 +42,11 @@ parser_action = subparsers.add_parser('action', help="Command to execute over th
 parser_action.add_argument("command", choices = ['stop', 'up', 'down', 'pos1', 'pos2'], default = 'stop')
 parser_action.add_argument("iveoId", type=int, help="IveoId / channel where the device is registered")
 parser_action.add_argument("--automation", type=bool, default=False, help="Set to true if the command has to be executed as an automation mecanism to not override manual interaction with the device")
+parser_action.add_argument("--discover", type=bool, default= False, help="Force the discover of devices before trying to execute the command")
 parser_action.set_defaults(func=action)
 
 args = parser.parse_args()
 args.func(args)
-
 
 
 

@@ -53,6 +53,7 @@ class Gateway():
                 while True:
                     response = self.ser.readall()
                     response_str += str(response.decode())
+                    print(response_str)
                     logging.info('read data: ' + response_str)
                     if (response.decode()== ''):
                         break
@@ -72,14 +73,16 @@ class Gateway():
     def discover(self):
         command = IveoCommandGetIds()
         command.execute(self)
-        self.devices = [IveoDevice(self, id, True) for id in command.ids]
-        self.list_devices()        
+        self.devices = dict([(id, IveoDevice(self, id , True) )for id in command.ids])
+        self.list_devices() 
+       
 
     def is_id_registered(self, id):
-        return id in [device.iveoID for device in self.devices]
+        return id in self.devices
+        #return id in [device.iveoID for device in self.devices]
 
     def list_devices(self):
-        for device in self.devices:
+        for id, device in self.devices.items():
             print(str(device))
             
     
@@ -90,6 +93,7 @@ if __name__ == '__main__':
     #manual = MethodCall("selve.GW.iveo.getIDs",[])
     portname = '/dev/cu.usbserial-DJ00T875'
     gat = Gateway(portname)
+    gat.list_devices()
 
     # device1 = IveoDevice(gat, 1)
     # device2 = IveoDevice(gat, 2)
