@@ -53,7 +53,7 @@ class Gateway():
                 while True:
                     response = self.ser.readall()
                     response_str += str(response.decode())
-                    print(response_str)
+                    #print(response_str)
                     logging.info('read data: ' + response_str)
                     if (response.decode()== ''):
                         break
@@ -67,8 +67,8 @@ class Gateway():
         
         return None
 
-    def serial_data(self, data):
-        print (data)
+    # def serial_data(self, data):
+    #     print (data)
 
     def discover(self):
         command = IveoCommandGetIds()
@@ -92,8 +92,10 @@ if __name__ == '__main__':
 
     #manual = MethodCall("selve.GW.iveo.getIDs",[])
     portname = '/dev/cu.usbserial-DJ00T875'
-    gat = Gateway(portname)
-    gat.list_devices()
+    gat = Gateway(portname, False)
+    device = IveoDevice(gat, 0)
+    device.stop(False)
+    #gat.list_devices()
 
     # device1 = IveoDevice(gat, 1)
     # device2 = IveoDevice(gat, 2)

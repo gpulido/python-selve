@@ -2,6 +2,7 @@
 from enum import Enum
 from itertools import chain
 import untangle
+import logging
 
 class DeviceType(Enum):
     UNKNOWN = 0
@@ -88,12 +89,16 @@ def create_response(obj):
 
 
 def process_response(xmlstr):
-    corrected_xml = xmlstr.replace('?xml version="1.0"? encoding="UTF-8"', '?xml version="1.0" encoding="UTF-8"?')
-    obj = untangle.parse(corrected_xml)
+    msgs = xmlstr.split('<?xml version="1.0"? encoding="UTF-8">')
+    msgs = [untangle.parse(res) for res in msgs if res!='']
+    list_res = [res for res in msgs if hasattr(res, 'methodResponse')]
+    if not list_res:
+        logging.error("Bad response format")
+        return None
+    obj = list_res[0]
     if hasattr(obj.methodResponse, 'fault'):
         return create_error(obj)
-    else:
-        return create_response(obj)
+    return create_response(obj)
 
 def main():
 
