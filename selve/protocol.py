@@ -1,6 +1,7 @@
-import untangle
+
 from enum import Enum
 from itertools import chain
+import untangle
 
 class DeviceType(Enum):
     UNKNOWN = 0

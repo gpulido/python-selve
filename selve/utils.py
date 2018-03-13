@@ -1,16 +1,7 @@
 import base64
-#from bitarray import bitarray
-from lxml import objectify
-
-def deserialize(response_xml_text):
-   response = objectify.fromstring(response_xml_text)
-   if (response[0].text == 'fault'):
-       print ('commanderror')
-   else:        
-       [element.tag for element in response.array.iterchildren]
-
 
 def singlemask(id):
+
     #Obtains a base64 encoded to modify just one index
     mask =  64 * [0]
     #need to transform the position
@@ -19,10 +10,6 @@ def singlemask(id):
     bitstring = "".join(str(x) for x in mask)
     return base64.b64encode(bitstring_to_bytes(bitstring)).decode('utf8')
 
-# def access_bit(data, num):
-#     base = int(num/8)
-#     shift = num % 8
-#     return (data[base] & (1<<shift)) >> shift
 
 def bitstring_to_bytes(s):
     return int(s, 2).to_bytes(len(s) // 8, byteorder='big')

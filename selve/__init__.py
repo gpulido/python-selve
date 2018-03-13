@@ -3,6 +3,7 @@
 import time
 import serial
 from enum import Enum
+import logging
 
 from selve.utils import * 
 from selve.iveo import *
@@ -32,13 +33,13 @@ class Gateway():
             
     def executeCommand(self, command):
         commandstr = command.serializeToXML()
-        print( "Gateway writting: " + str(commandstr))
-        
+        logging.info('Gateway writting: ' + str(commandstr))
+
         try:
             self.configserial()
 
-        except Exception as e:
-            print ("error open serial port: " + str(e))
+        except Exception as e:            
+            logging.error ('error open serial port: ' + str(e))
             exit()
         
         if self.ser.isOpen():
@@ -52,16 +53,16 @@ class Gateway():
                 while True:
                     response = self.ser.readall()
                     response_str += str(response.decode())
-                    print("read data: " + response_str)
+                    logging.info('read data: ' + response_str)
                     if (response.decode()== ''):
                         break
                     
                 self.ser.close()
                 return process_response(response_str)
             except Exception as e1:
-                print ("error communicating...: " + str(e1))
+                logging.exception ("error communicating...: " + str(e1))
         else:
-            print ("cannot open serial port")
+            logging.error ("cannot open serial port")
         
         return None
 
