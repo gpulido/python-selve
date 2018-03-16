@@ -10,14 +10,25 @@ from selve.iveo import *
 from selve.protocol import *
 
 
-class Gateway():
+class Gateway():   
 
     def __init__(self, port, discover = True):
+        """                
+        Arguments:
+            port {String} -- Serial port string as it is used in pyserial
+        
+        Keyword Arguments:
+            discover {bool} -- True if the gateway should try to discover 
+                               the devices on init (default: {True})
+        """
         self.port = port
         if discover:
             self.discover()
     
     def configserial(self):
+        """
+        Configure the serial port to be used
+        """
         self.ser = serial.Serial(
             port=self.port,
             baudrate=115200,

@@ -1,12 +1,11 @@
 import base64
 
 def singlemask(id):
-
+    
     #Obtains a base64 encoded to modify just one index
     mask =  64 * [0]
     #need to transform the position
-    newid = int((id // 8) * 8  + 7 - (id % 8))
-    #print(newid)    
+    newid = int((id // 8) * 8  + 7 - (id % 8))    
     mask[newid] = 1
     bitstring = "".join(str(x) for x in mask)
     return base64.b64encode(bitstring_to_bytes(bitstring)).decode('utf8')
