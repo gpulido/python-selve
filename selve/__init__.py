@@ -27,7 +27,7 @@ class Gateway():
     
     def configserial(self):
         """
-        Configure the serial port to be used
+        Configure the serial port
         """
         self.ser = serial.Serial(
             port=self.port,
@@ -43,6 +43,22 @@ class Gateway():
 
             
     def executeCommand(self, command):
+        """[summary]
+        Execute the given command using the serial port.
+        It opens a communication to the serial port each time a
+        command is executed.
+        At this moment it doesn't keep a queue of commands. If
+        a command blocks the serial it will wait.
+        
+        Arguments:
+            command {protocol.MethodCall} -- Command to be send 
+            through the serial port
+        
+        Returns:
+            MethodResponse -- if the command was executed 
+            sucessufully
+            ErrorResponse -- if the gateway returns an error
+        """
         commandstr = command.serializeToXML()
         logging.info('Gateway writting: ' + str(commandstr))
 
@@ -82,6 +98,9 @@ class Gateway():
     #     print (data)
 
     def discover(self):
+        """[summary]
+            Discover all devices registered on the usb-commeo        
+        """
         command = IveoCommandGetIds()
         command.execute(self)
         self.devices = dict([(id, IveoDevice(self, id , True) )for id in command.ids])
@@ -89,10 +108,22 @@ class Gateway():
        
 
     def is_id_registered(self, id):
+        """[summary]
+        check if a device id is registered on the gateway
+        Arguments:
+            id {int} -- Device id to check
+        
+        Returns:
+            boolean -- True if the id is registered
+                       False otherwise
+        """
         return id in self.devices
-        #return id in [device.iveoID for device in self.devices]
+        
 
     def list_devices(self):
+        """[summary]
+        Print the list of registered devices
+        """ 
         for id, device in self.devices.items():
             print(str(device))
             
