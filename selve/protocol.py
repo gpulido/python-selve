@@ -30,7 +30,8 @@ class ParameterType(Enum):
     STRING = "string"
     BASE64 = "base64"
 
-class MethodCall:   
+class MethodCall:
+
     def __init__(self, method_name, parameters = []):
         self.method_name = method_name
         self.parameters = parameters
