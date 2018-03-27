@@ -7,6 +7,7 @@ from selve.protocol import CommandType
 from selve.utils import singlemask
 from selve.utils import true_in_list
 from selve.utils import b64bytes_to_bitlist
+import logging
 
 class IveoCommand(Enum):
     FACTORY = "commandFactory"
@@ -129,6 +130,13 @@ class IveoDevice():
 
     def moveIntermediatePosition2(self, automatic = False):
         self.executeCommand(CommandType.POSITION_2, automatic)
+    
+    def learnChannel(self, channel):
+        command = IveoCommandLearn(self.iveoID)
+        command.execute(self.gateway)
+        if command.executed:
+            logging.info("Device with id " + str(self.iveoID) + " learning")
+            self.gateway.teach_channel(channel)
 
     def executeCommand(self, commandType, automatic = False):
         if automatic:

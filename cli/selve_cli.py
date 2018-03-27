@@ -19,7 +19,6 @@ def action(args):
     else:
         device = selve.IveoDevice(gat, args.iveoId)
 
-
     if args.command == 'stop':
         device.stop(args.automation)
     elif args.command == 'up':
@@ -30,6 +29,11 @@ def action(args):
         device.moveIntermediatePosition1(args.automation)
     elif args.command == 'pos2':
         device.moveIntermediatePosition2(args.automation)
+
+def teach(args):
+    gat = selve.Gateway(args.port, False)
+    device = selve.IveoDevice(gat, args.iveoId)
+    device.learnChannel(args.channel)
 
 
 parser = argparse.ArgumentParser(prog='selve-cli')
@@ -44,6 +48,11 @@ parser_action.add_argument("iveoId", type=int, help="IveoId / channel where the 
 parser_action.add_argument("--automation", type=bool, default=False, help="Set to true if the command has to be executed as an automation mecanism to not override manual interaction with the device")
 parser_action.add_argument("--discover", type=bool, default= False, help="Force the discover of devices before trying to execute the command")
 parser_action.set_defaults(func=action)
+
+parser_teach = subparsers.add_parser('teach', help="Command to teach a channel into an already learned device")
+parser_teach.add_argument("channel", type=int, help="channel to be teach")
+parser_teach.add_argument("iveoId", type=int, help="device that is going to learn the channel")
+parser_action.set_defaults(func=teach)
 
 args = parser.parse_args()
 args.func(args)

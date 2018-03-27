@@ -119,7 +119,6 @@ class Gateway():
         """
         return id in self.devices
         
-
     def list_devices(self):
         """[summary]
         Print the list of registered devices
@@ -127,7 +126,12 @@ class Gateway():
         for id, device in self.devices.items():
             print(str(device))
             
-    
+    def teach_channel(self, channel):
+        command = IveoCommandTeach(channel)
+        logging.info("Trying to teach channel " + str(channel))
+        command.execute()
+        if command.executed:
+            logging.info("Channel " + str(channel) + "sucessfully teach" )
 
 if __name__ == '__main__':
     #print (singlemask(2).decode('utf-8'))
