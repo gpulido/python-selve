@@ -52,7 +52,7 @@ parser_action.set_defaults(func=action)
 parser_teach = subparsers.add_parser('teach', help="Command to teach a channel into an already learned device")
 parser_teach.add_argument("channel", type=int, help="channel to be teach")
 parser_teach.add_argument("iveoId", type=int, help="device that is going to learn the channel")
-parser_action.set_defaults(func=teach)
+parser_teach.set_defaults(func=teach)
 
 args = parser.parse_args()
 args.func(args)

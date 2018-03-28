@@ -129,7 +129,7 @@ class Gateway():
     def teach_channel(self, channel):
         command = IveoCommandTeach(channel)
         logging.info("Trying to teach channel " + str(channel))
-        command.execute()
+        command.execute(self)
         if command.executed:
             logging.info("Channel " + str(channel) + "sucessfully teach" )
 
