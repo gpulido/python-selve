@@ -39,6 +39,7 @@ def teach(args):
 parser = argparse.ArgumentParser(prog='selve-cli')
 parser.add_argument("port", type=str, help="serial port")
 subparsers = parser.add_subparsers(help='sub-command help')
+
 parser_list = subparsers.add_parser('list', help="print the list of registered  devices")
 parser_list.set_defaults(func=list_devices)
 

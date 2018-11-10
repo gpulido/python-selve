@@ -53,7 +53,7 @@ class MethodCall:
             self.process_response(response)
     
     def process_response(self, methodResponse):
-        print (methodResponse)
+        logging.debug(methodResponse)
 
 
 class MethodResponse:

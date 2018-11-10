@@ -49,7 +49,7 @@ class IveoCommandTeach(CommandSingleIveo):
     def process_response(self, methodResponse):
         self.executed = bool(methodResponse.parameters[0][1])   
 
-class IveoCommandLearn(CommandSingleIveo):
+class IveoCommandLearn(Comman dSingleIveo):
     def __init__(self, iveoID):
         super().__init__(IveoCommand.LEARN, iveoID)
     
