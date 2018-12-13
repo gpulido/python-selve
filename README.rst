@@ -1,5 +1,8 @@
 Python control of selve devices through USB-RF Gateway
 ======================================================
+
+|PyPI version|
+
 A simple Python API for controlling RF Blinds / shutters / awning from selve using a USB-RF Gateway.
 At present, only Iveo devices are supported.
 
@@ -37,6 +40,9 @@ The library also allows to send directly commands to the gateway without the nee
     command.execute(gat)
 
 Once executed the response is stored in the command instance for later user or just to discard.
+
+.. |PyPI version| image:: https://badge.fury.io/py/python-selve.svg
+   :target: https://badge.fury.io/py/python-selve
 
 
 
