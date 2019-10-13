@@ -89,7 +89,7 @@ def create_response(obj):
 
 
 def process_response(xmlstr):
-    msgs = xmlstr.split('<?xml version="1.0"? encoding="UTF-8">')
+    msgs = xmlstr.split('<?xml version="1.0" encoding="UTF-8"?>')
     msgs = [untangle.parse(res) for res in msgs if res!='']
     list_res = [res for res in msgs if hasattr(res, 'methodResponse')]
     if not list_res:
@@ -124,7 +124,7 @@ def main():
     </methodResponse>
     '''
 
-    a ='<?xml version="1.0"? encoding="UTF-8">\r\n<methodResponse>\r\n\t<array>\r\n\t\t<string>selve.GW.iveo.getIDs</string>\r\n\t\t<base64>fx4AAAAAAAA=</base64>\r\n\t</array>\r\n</methodResponse>\r\n\n'
+    a ='<?xml version="1.0" encoding="UTF-8"?>\r\n<methodResponse>\r\n\t<array>\r\n\t\t<string>selve.GW.iveo.getIDs</string>\r\n\t\t<base64>fx4AAAAAAAA=</base64>\r\n\t</array>\r\n</methodResponse>\r\n\n'
 
     process_response(selve_string)
 
