@@ -9,6 +9,10 @@ from selve.utils import true_in_list
 from selve.utils import b64bytes_to_bitlist
 import logging
 
+
+
+_LOGGER = logging.getLogger(__name__)
+
 class IveoCommand(Enum):
     FACTORY = "commandFactory"
     SETCONFIG = "setConfig"
@@ -103,7 +107,7 @@ class IveoCommandGetIds(CommandIveo):
     
     def process_response(self, methodResponse):
         self.ids = [ b for b in true_in_list(b64bytes_to_bitlist(methodResponse.parameters[0][1]))]
-        logging.debug(self.ids)
+        _LOGGER.debug(self.ids)
 
 class IveoDevice():
 
@@ -135,7 +139,7 @@ class IveoDevice():
         command = IveoCommandLearn(self.iveoID)
         command.execute(self.gateway)
         if command.executed:
-            logging.info("Device with id " + str(self.iveoID) + " learning")
+            _LOGGER.info("Device with id " + str(self.iveoID) + " learning")
             self.gateway.teach_channel(channel)
 
     def executeCommand(self, commandType, automatic = False):

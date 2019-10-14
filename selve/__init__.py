@@ -10,6 +10,7 @@ from selve.iveo import *
 from selve.protocol import *
 
 
+_LOGGER = logging.getLogger(__name__)
 class Gateway():   
 
     def __init__(self, port, discover = True):
@@ -60,13 +61,13 @@ class Gateway():
             ErrorResponse -- if the gateway returns an error
         """
         commandstr = command.serializeToXML()
-        logging.info('Gateway writting: ' + str(commandstr))
+        _LOGGER.info('Gateway writting: ' + str(commandstr))
 
         try:
             self.configserial()
 
         except Exception as e:            
-            logging.error ('error open serial port: ' + str(e))
+            _LOGGER.error ('error open serial port: ' + str(e))
             exit()
         
         if self.ser.isOpen():
@@ -81,16 +82,16 @@ class Gateway():
                     response = self.ser.readall()
                     response_str += str(response.decode())
                     #print(response_str)
-                    logging.info('read data: ' + response_str)
+                    _LOGGER.info('read data: ' + response_str)
                     if (response.decode()== ''):
                         break
                     
                 self.ser.close()
                 return process_response(response_str)
             except Exception as e1:
-                logging.exception ("error communicating...: " + str(e1))
+                _LOGGER.exception ("error communicating...: " + str(e1))
         else:
-            logging.error ("cannot open serial port")
+            _LOGGER.error ("cannot open serial port")
         
         return None
 
@@ -128,10 +129,10 @@ class Gateway():
             
     def teach_channel(self, channel):
         command = IveoCommandTeach(channel)
-        logging.info("Trying to teach channel " + str(channel))
+        _LOGGER.info("Trying to teach channel " + str(channel))
         command.execute(self)
         if command.executed:
-            logging.info("Channel " + str(channel) + "sucessfully teach" )
+            _LOGGER.info("Channel " + str(channel) + "sucessfully teach" )
 
 if __name__ == '__main__':
     #print (singlemask(2).decode('utf-8'))

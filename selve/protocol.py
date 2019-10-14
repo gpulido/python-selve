@@ -4,6 +4,8 @@ from itertools import chain
 import untangle
 import logging
 
+
+_LOGGER = logging.getLogger(__name__)
 class DeviceType(Enum):
     UNKNOWN = 0
     SHUTTER = 1
@@ -53,7 +55,7 @@ class MethodCall:
             self.process_response(response)
     
     def process_response(self, methodResponse):
-        logging.debug(methodResponse)
+        _LOGGER.debug(methodResponse)
 
 
 class MethodResponse:
@@ -91,7 +93,7 @@ def create_response(obj):
 def process_response(xmlstr):
     res = untangle.parse(xmlstr)
     if not hasattr(res, 'methodResponse'):
-        logging.error("Bad response format")
+        _LOGGER.error("Bad response format")
         return None
     if hasattr(res.methodResponse, 'fault'):
         return create_error(res)
