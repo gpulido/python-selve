@@ -89,16 +89,13 @@ def create_response(obj):
 
 
 def process_response(xmlstr):
-    msgs = xmlstr.split('<?xml version="1.0" encoding="UTF-8"?>')
-    msgs = [untangle.parse(res) for res in msgs if res!='']
-    list_res = [res for res in msgs if hasattr(res, 'methodResponse')]
-    if not list_res:
+    res = untangle.parse(xmlstr)
+    if not hasattr(res, 'methodResponse'):
         logging.error("Bad response format")
         return None
-    obj = list_res[0]
-    if hasattr(obj.methodResponse, 'fault'):
-        return create_error(obj)
-    return create_response(obj)
+    if hasattr(res.methodResponse, 'fault'):
+        return create_error(res)
+    return create_response(res)
 
 def main():
 
