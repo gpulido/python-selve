@@ -93,7 +93,7 @@ def create_response(obj):
 def process_response(xmlstr):
     _LOGGER.debug(str(xmlstr))
     #The selve device sometimes answers a badformed header. This is a patch
-    xmlstr = xmlstr.replace('<?xml version="1.0"? encoding="UTF-8">', '<?xml version="1.0" encoding="UTF-8"?>')
+    xmlstr = str(xmlstr).replace('<?xml version="1.0"? encoding="UTF-8">', '<?xml version="1.0" encoding="UTF-8"?>')
     res = untangle.parse(xmlstr)
     if not hasattr(res, 'methodResponse'):
         _LOGGER.error("Bad response format")

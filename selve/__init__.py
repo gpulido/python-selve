@@ -11,7 +11,7 @@ from selve.protocol import process_response
 
 
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.setLevel(logging.DEBUG)
+
 class Gateway():   
 
     def __init__(self, port, discover = True):
@@ -82,11 +82,11 @@ class Gateway():
                 while True:
                     response = self.ser.readline().strip()
                     response_str += response.decode()
-                    if (response.decode()== ''):
+                    if (response.decode() == ''):
                         break
                     
                 self.ser.close()
-                _LOGGER.debug('read data: ' + response_str)
+                _LOGGER.info('read data: ' + response_str)
                 return process_response(response_str)
             except Exception as e1:
                 _LOGGER.exception ("error communicating...: " + str(e1))
@@ -111,7 +111,7 @@ class Gateway():
             time.sleep(1)
         
         if not hasattr(command, "ids"):
-            _LOGGER.Info("Associated Devices not found") 
+            _LOGGER.info("Associated Devices not found") 
             self.devices = {}
         else:
             _LOGGER.debug(f'discover ids: {command.ids}')
