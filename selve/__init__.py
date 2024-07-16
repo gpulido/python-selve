@@ -36,7 +36,8 @@ class Gateway():
             baudrate=115200,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS)
+            bytesize=serial.EIGHTBITS,
+            timeout=1)
         self.ser.timeout = 0
         self.ser.xonxoff = False
         self.ser.rtscts = False
@@ -75,14 +76,15 @@ class Gateway():
             try:
                 self.ser.flushInput()
                 self.ser.flushOutput()
-                
                 self.ser.write(commandstr)
-                time.sleep(0.5)
-                response_str = "" 
+                self.ser.flush()
+                #time.sleep(0.5)
+                response_str = ""
                 while True:
                     response = self.ser.readline().strip()
                     response_str += response.decode()
-                    if (response.decode() == ''):
+                    _LOGGER.info('read data: ' + response_str)
+                    if response.decode() == '':
                         break
                     
                 self.ser.close()

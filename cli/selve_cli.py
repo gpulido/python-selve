@@ -6,7 +6,7 @@ import argparse
 
 
 def list_devices(args):
-    print (list_devices)
+    print ('list_devices')
     gat = selve.Gateway(args.port)
     gat.list_devices()
 
