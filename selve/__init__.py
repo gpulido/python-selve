@@ -1,6 +1,4 @@
 #!/usr/bin/python
-
-import time
 import serial
 from enum import Enum
 import logging
@@ -110,7 +108,7 @@ class Gateway():
         while not hasattr(command, "ids") and retry_n <=num_retries:
             command.execute(self)
             retry_n += 1
-            time.sleep(1)
+            #time.sleep(1)
         
         if not hasattr(command, "ids"):
             _LOGGER.info("Associated Devices not found") 
