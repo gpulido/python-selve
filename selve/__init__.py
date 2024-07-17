@@ -1,7 +1,8 @@
 #!/usr/bin/python
+import time
 import serial
-from enum import Enum
 import logging
+from threading import Lock
 
 from selve.utils import * 
 from selve.iveo import *
@@ -22,6 +23,7 @@ class Gateway():
                                the devices on init (default: {True})
         """
         self.port = port
+        self.lock = Lock()
         if discover:
             self.discover()
     
@@ -64,35 +66,37 @@ class Gateway():
         _LOGGER.info('Gateway writting: ' + str(commandstr))
 
         try:
+            self.lock.adquire()
             self.configserial()
 
+            if self.ser.isOpen():
+                try:
+                    self.ser.flushInput()
+                    self.ser.flushOutput()
+                    self.ser.write(commandstr)
+                    self.ser.flush()
+                    time.sleep(0.5)
+                    response_str = ""
+                    while True:
+                        response = self.ser.readline().strip()
+                        response_str += response.decode()
+                        _LOGGER.info('read data: ' + response_str)
+                        if response.decode() == '':
+                            break
+                        
+                    self.ser.close()
+                    _LOGGER.info('read data: ' + response_str)
+                    return process_response(response_str)
+                except Exception as e1:
+                    _LOGGER.exception ("error communicating...: " + str(e1))
+            else:
+                _LOGGER.error ("cannot open serial port")
+        
         except Exception as e:            
             _LOGGER.error ('error open serial port: ' + str(e))
             exit()
-        
-        if self.ser.isOpen():
-            try:
-                self.ser.flushInput()
-                self.ser.flushOutput()
-                self.ser.write(commandstr)
-                self.ser.flush()
-                #time.sleep(0.5)
-                response_str = ""
-                while True:
-                    response = self.ser.readline().strip()
-                    response_str += response.decode()
-                    _LOGGER.info('read data: ' + response_str)
-                    if response.decode() == '':
-                        break
-                    
-                self.ser.close()
-                _LOGGER.info('read data: ' + response_str)
-                return process_response(response_str)
-            except Exception as e1:
-                _LOGGER.exception ("error communicating...: " + str(e1))
-        else:
-            _LOGGER.error ("cannot open serial port")
-        
+        finally:
+            self.lock.release()
         return None
 
     # def serial_data(self, data):
@@ -108,7 +112,7 @@ class Gateway():
         while not hasattr(command, "ids") and retry_n <=num_retries:
             command.execute(self)
             retry_n += 1
-            #time.sleep(1)
+            time.sleep(1)
         
         if not hasattr(command, "ids"):
             _LOGGER.info("Associated Devices not found") 
