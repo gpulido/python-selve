@@ -15,7 +15,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     
     name='python-selve',  # Required    
-    version='1.4.0',  # Required  
+    version='1.4.1',  # Required  
     description='Python library for interfacing with selve devices using the USB-RF controller',  # Required   
     long_description=long_description,  # Optional    
     url='https://github.com/gpulido/python-selve',  # Optional

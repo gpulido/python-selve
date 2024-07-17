@@ -66,7 +66,7 @@ class Gateway():
         _LOGGER.info('Gateway writting: ' + str(commandstr))
 
         try:
-            self.lock.adquire()
+            self.lock.acquire()
             self.configserial()
 
             if self.ser.isOpen():
@@ -83,8 +83,7 @@ class Gateway():
                         _LOGGER.info('read data: ' + response_str)
                         if response.decode() == '':
                             break
-                        
-                    self.ser.close()
+                    self.ser.close()    
                     _LOGGER.info('read data: ' + response_str)
                     return process_response(response_str)
                 except Exception as e1:
